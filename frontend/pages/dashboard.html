@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — User Management System</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    body { background: var(--bg); }
+
+    /* Tab Navigation */
+    .tab-nav {
+      display: flex;
+      gap: 0.25rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .tab-btn {
+      padding: 0.65rem 1.25rem;
+      border: none;
+      background: none;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all var(--transition);
+    }
+
+    .tab-btn.active {
+      color: var(--teal);
+      border-bottom-color: var(--teal);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Edit form inside dashboard */
+    .edit-section {
+      display: none;
+    }
+
+    .edit-section.visible {
+      display: block;
+      animation: fadeSlide 0.25s ease;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Password strength bar */
+    .strength-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      margin-top: 0.4rem;
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+
+    /* Logout button */
+    .logout-btn {
+      background: none;
+      border: 1.5px solid var(--coral);
+      color: var(--coral);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .logout-btn:hover {
+      background: var(--coral);
+      color: var(--white);
+    }
+
+    /* Project Card */
+    .project-card {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 0.75rem;
+      background: var(--bg);
+    }
+
+    .project-card h4 {
+      font-family: var(--font-display);
+      color: var(--teal);
+      font-size: 1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .project-card p {
+      font-size: 0.88rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .project-links {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .project-links a {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--teal);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .empty-state .icon {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ───────────────────────────────────────────────── -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <div class="navbar-brand-icon">👤</div>
+    UserMS
+  </div>
+
+  <div class="navbar-right">
+    <div class="navbar-user-info">
+      <div class="name" id="navName">Loading...</div>
+      <div class="role" id="navRole">User</div>
+    </div>
+    <div id="navAvatarWrap"></div>
+    <button class="logout-btn" onclick="handleLogout()">Logout</button>
+  </div>
+</nav>
+
+<!-- ── Main Dashboard ──────────────────────────────────────── -->
+<main class="dashboard-body">
+
+  <!-- Alert -->
+  <div class="alert" id="dashAlert" style="margin-bottom:1.5rem;"></div>
+
+  <!-- Profile Header Card -->
+  <div class="profile-header-card">
+    <div id="profileAvatarWrap"></div>
+    <div class="profile-info">
+      <h2 id="profileFullName">—</h2>
+      <div class="email" id="profileEmail">—</div>
+      <div class="profile-badge" id="profileRole">user</div>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('overview', this)">Overview</button>
+    <button class="tab-btn" onclick="switchTab('edit', this)">Edit Profile</button>
+    <button class="tab-btn" onclick="switchTab('security', this)">Security</button>
+  </div>
+
+  <!-- ── Tab: Overview ──────────────────────────────────── -->
+  <div class="tab-panel active" id="tab-overview">
+
+    <!-- Account Info -->
+    <div class="info-card">
+      <div class="info-card-header">
+        <div class="info-card-title">👤 Account Info</div>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>First Name</label>
+          <span id="v_firstName">—</span>
+        </div>
+        <div class="info-item">
+          <label>Last Name</label>
+          <span id="v_lastName">—</span>
+        </div>
+        <div class="info-item">
+          <label>Email</label>
+          <span id="v_email">—</span>
+        </div>
+        <div class="info-item">
+          <label>Mobile</label>
+          <span id="v_mobile">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal Info -->
+    <div class="info-card">
+      <div class="info-card-header">
+        <div class="info-card-title">📝 Personal Details</div>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Date of Birth</label>
+          <span id="v_dob">—</span>
+        </div>
+        <div class="info-item">
+          <label>Gender</label>
+          <span id="v_gender">—</span>
+        </div>
+        <div class="info-item" style="grid-column:1/-1">
+          <label>Bio</label>
+          <span id="v_bio">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Address -->
+    <div class="info-card">
+      <div class="info-card-header">
+        <div class="info-card-title">📍 Address</div>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Current Address</label>
+          <span id="v_currentAddress">—</span>
+        </div>
+        <div class="info-item">
+          <label>Permanent Address</label>
+          <span id="v_permanentAddress">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Education -->
+    <div class="info-card">
+      <div class="info-card-header">
+        <div class="info-card-title">🎓 Education</div>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Qualification</label>
+          <span id="v_qualification">—</span>
+        </div>
+        <div class="info-item">
+          <label>Passing Year</label>
+          <span id="v_passingYear">—</span>
+        </div>
+        <div class="info-item" style="grid-column:1/-1">
+          <label>Institute</label>
+          <span id="v_institute">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Socials -->
+    <div class="info-card">
+      <div class="info-card-header">
+        <div class="info-card-title">🔗 Links & Socials</div>
+      </div>
+      <div id="v_socials">—</div>
+    </div>
+
+    <!-- Projects -->
+    <div class="info-card">
+      <div class="info-card-header">
+        <div class="info-card-title">🚀 Projects</div>
+      </div>
+      <div id="v_projects"></div>
+    </div>
+
+  </div>
+
+  <!-- ── Tab: Edit Profile ──────────────────────────────── -->
+  <div class="tab-panel" id="tab-edit">
+    <div class="info-card">
+      <div class="info-card-title" style="margin-bottom:1.5rem;">Edit Your Profile</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="e_firstName">First Name</label>
+          <input type="text" id="e_firstName" />
+        </div>
+        <div class="form-group">
+          <label for="e_lastName">Last Name</label>
+          <input type="text" id="e_lastName" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="e_mobile">Mobile</label>
+        <input type="tel" id="e_mobile" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="e_dob">Date of Birth</label>
+          <input type="date" id="e_dob" />
+        </div>
+        <div class="form-group">
+          <label for="e_gender">Gender</label>
+          <select id="e_gender">
+            <option value="">—</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+            <option value="prefer_not_to_say">Prefer not to say</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="e_bio">Bio</label>
+        <textarea id="e_bio" rows="3" maxlength="500" style="resize:vertical;"></textarea>
+      </div>
+
+      <hr style="border:none; border-top:1.5px solid var(--border); margin:1.5rem 0;" />
+      <div style="font-weight:600; color:var(--teal); margin-bottom:1rem;">Education</div>
+
+      <div class="form-group">
+        <label for="e_qualification">Qualification</label>
+        <select id="e_qualification">
+          <option value="">—</option>
+          <option value="High School">High School</option>
+          <option value="Diploma">Diploma</option>
+          <option value="Bachelor's">Bachelor's Degree</option>
+          <option value="Master's">Master's Degree</option>
+          <option value="PhD">PhD / Doctorate</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="e_institute">Institute</label>
+          <input type="text" id="e_institute" />
+        </div>
+        <div class="form-group">
+          <label for="e_passingYear">Passing Year</label>
+          <input type="number" id="e_passingYear" min="1950" max="2030" />
+        </div>
+      </div>
+
+      <hr style="border:none; border-top:1.5px solid var(--border); margin:1.5rem 0;" />
+      <div style="font-weight:600; color:var(--teal); margin-bottom:1rem;">Links & Socials</div>
+
+      <div class="form-group">
+        <label for="e_github">GitHub</label>
+        <input type="url" id="e_github" placeholder="https://github.com/username" />
+      </div>
+      <div class="form-group">
+        <label for="e_linkedin">LinkedIn</label>
+        <input type="url" id="e_linkedin" placeholder="https://linkedin.com/in/username" />
+      </div>
+      <div class="form-group">
+        <label for="e_portfolio">Portfolio</label>
+        <input type="url" id="e_portfolio" placeholder="https://yoursite.com" />
+      </div>
+      <div class="form-group">
+        <label for="e_resume">Resume Link</label>
+        <input type="url" id="e_resume" />
+      </div>
+
+      <button class="btn btn-primary" onclick="saveProfile()" id="saveBtn">
+        Save Changes
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Tab: Security ──────────────────────────────────── -->
+  <div class="tab-panel" id="tab-security">
+    <div class="info-card" style="max-width:420px;">
+      <div class="info-card-title" style="margin-bottom:1.5rem;">Change Password</div>
+
+      <div class="alert" id="pwAlert"></div>
+
+      <div class="form-group">
+        <label for="currentPw">Current Password</label>
+        <input type="password" id="currentPw" placeholder="Enter current password" />
+      </div>
+      <div class="form-group">
+        <label for="newPw">New Password</label>
+        <input type="password" id="newPw" placeholder="Min 6 characters" />
+        <div class="strength-bar">
+          <div class="strength-fill" id="pwStrengthFill"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="confirmPw">Confirm New Password</label>
+        <input type="password" id="confirmPw" placeholder="Repeat new password" />
+      </div>
+
+      <button class="btn btn-primary" onclick="changePassword()" id="changePwBtn">
+        Update Password
+      </button>
+    </div>
+  </div>
+
+</main>
+
+<script src="../js/dashboard.js"></script>
+</body>
+</html>

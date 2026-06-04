@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — User Management System</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    /* Step panels: show only the active one */
+    .step-panel { display: none; }
+    .step-panel.active { display: block; }
+
+    /* Animated form entry */
+    .step-panel.active {
+      animation: fadeSlide 0.3s ease;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateX(16px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Password strength bar */
+    .strength-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      margin-top: 0.4rem;
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+
+    /* Navigation buttons */
+    .step-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+      gap: 1rem;
+    }
+
+    /* Review avatar */
+    .review-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--teal);
+      display: block;
+      margin: 0 auto 1rem;
+    }
+
+    .review-avatar-placeholder {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.75rem;
+      color: var(--white);
+      margin: 0 auto 1rem;
+      font-family: var(--font-display);
+    }
+
+    /* Project item in the form */
+    .project-item {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      background: var(--bg);
+      position: relative;
+    }
+
+    .project-remove {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      color: var(--coral);
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .add-project-btn {
+      font-size: 0.85rem;
+      color: var(--teal);
+      background: none;
+      border: 1.5px dashed var(--teal);
+      border-radius: var(--radius);
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      width: 100%;
+      transition: all var(--transition);
+    }
+
+    .add-project-btn:hover {
+      background: rgba(74, 97, 99, 0.06);
+    }
+
+    /* Same-as-current checkbox */
+    .same-address-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .same-address-row label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text);
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .same-address-row input[type="checkbox"] {
+      width: auto;
+      accent-color: var(--teal);
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-layout">
+  <!-- ── Left Panel ─────────────────────────────────────── -->
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="auth-brand-icon">👤</div>
+      <span class="auth-brand-name">UserMS</span>
+    </div>
+
+    <h1>Build your profile.</h1>
+    <p>Join the platform and get started with a complete, professional profile.</p>
+
+    <ul class="auth-features">
+      <li>
+        <span class="icon" style="background:rgba(255,201,75,0.2)">✦</span>
+        Role-based access control
+      </li>
+      <li>
+        <span class="icon" style="background:rgba(249,166,108,0.2)">🔒</span>
+        Secure JWT authentication
+      </li>
+      <li>
+        <span class="icon" style="background:rgba(241,122,126,0.2)">📋</span>
+        Rich profile with projects & education
+      </li>
+      <li>
+        <span class="icon" style="background:rgba(249,250,244,0.15)">⚡</span>
+        Fast, clean dashboard experience
+      </li>
+    </ul>
+  </div>
+
+  <!-- ── Right Panel (Form) ─────────────────────────────── -->
+  <div class="auth-right">
+    <div style="max-width: 560px; width: 100%; margin: 0 auto;">
+
+      <div class="accent-bar"></div>
+
+      <h2 style="margin-bottom: 0.25rem;">Create Account</h2>
+      <p style="margin-bottom: 2rem;">
+        Already have an account?
+        <a href="login.html">Sign in here</a>
+      </p>
+
+      <!-- Step Progress Bar -->
+      <div class="steps-bar" id="stepsBar">
+        <div class="step-item active" data-step="1">
+          <div class="step-dot">1</div>
+          <span class="step-label">Account</span>
+        </div>
+        <div class="step-item" data-step="2">
+          <div class="step-dot">2</div>
+          <span class="step-label">Personal</span>
+        </div>
+        <div class="step-item" data-step="3">
+          <div class="step-dot">3</div>
+          <span class="step-label">Address</span>
+        </div>
+        <div class="step-item" data-step="4">
+          <div class="step-dot">4</div>
+          <span class="step-label">Education</span>
+        </div>
+        <div class="step-item" data-step="5">
+          <div class="step-dot">5</div>
+          <span class="step-label">Links</span>
+        </div>
+        <div class="step-item" data-step="6">
+          <div class="step-dot">6</div>
+          <span class="step-label">Projects</span>
+        </div>
+        <div class="step-item" data-step="7">
+          <div class="step-dot">7</div>
+          <span class="step-label">Photo</span>
+        </div>
+        <div class="step-item" data-step="8">
+          <div class="step-dot">✓</div>
+          <span class="step-label">Review</span>
+        </div>
+      </div>
+
+      <!-- Alert -->
+      <div class="alert" id="formAlert"></div>
+
+      <!-- ── STEP 1: Account ─────────────────────────────── -->
+      <div class="step-panel active" id="step-1">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First Name *</label>
+            <input type="text" id="firstName" placeholder="Jane" />
+            <span class="field-error" id="firstNameErr">Required</span>
+          </div>
+          <div class="form-group">
+            <label for="lastName">Last Name *</label>
+            <input type="text" id="lastName" placeholder="Doe" />
+            <span class="field-error" id="lastNameErr">Required</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" placeholder="jane@example.com" />
+          <span class="field-error" id="emailErr">Enter a valid email</span>
+        </div>
+        <div class="form-group">
+          <label for="mobile">Mobile Number</label>
+          <input type="tel" id="mobile" placeholder="+91 98765 43210" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password *</label>
+          <input type="password" id="password" placeholder="Min 6 characters" />
+          <div class="strength-bar">
+            <div class="strength-fill" id="strengthFill"></div>
+          </div>
+          <span class="field-error" id="passwordErr">Min 6 characters required</span>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password *</label>
+          <input type="password" id="confirmPassword" placeholder="Repeat password" />
+          <span class="field-error" id="confirmPasswordErr">Passwords do not match</span>
+        </div>
+
+        <div class="step-nav">
+          <span></span>
+          <button class="btn btn-primary" onclick="goToStep(2)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 2: Personal ───────────────────────────── -->
+      <div class="step-panel" id="step-2">
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" />
+        </div>
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select id="gender">
+            <option value="">Select gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+            <option value="prefer_not_to_say">Prefer not to say</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="bio">Bio <span style="font-weight:400;text-transform:none;font-size:.8rem;">(max 500 chars)</span></label>
+          <textarea id="bio" rows="3" placeholder="Tell us a little about yourself..." maxlength="500" style="resize:vertical;"></textarea>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn btn-outline" onclick="goToStep(1)">← Back</button>
+          <button class="btn btn-primary" onclick="goToStep(3)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3: Address ───────────────────────────── -->
+      <div class="step-panel" id="step-3">
+        <h3 style="color:var(--teal); margin-bottom:1rem; font-size:1rem;">Current Address</h3>
+        <div class="form-group">
+          <label for="currAddressLine">Address Line</label>
+          <input type="text" id="currAddressLine" placeholder="House No., Street, Area" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="currCity">City</label>
+            <input type="text" id="currCity" placeholder="City" />
+          </div>
+          <div class="form-group">
+            <label for="currState">State</label>
+            <input type="text" id="currState" placeholder="State" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="currCountry">Country</label>
+            <input type="text" id="currCountry" placeholder="Country" />
+          </div>
+          <div class="form-group">
+            <label for="currPincode">Pincode</label>
+            <input type="text" id="currPincode" placeholder="000000" />
+          </div>
+        </div>
+
+        <hr style="border:none; border-top:1.5px solid var(--border); margin:1.5rem 0;" />
+
+        <div class="same-address-row">
+          <input type="checkbox" id="sameAsCurrent" onchange="toggleSameAddress(this)" />
+          <label for="sameAsCurrent">Permanent address same as current</label>
+        </div>
+
+        <div id="permanentAddressSection">
+          <h3 style="color:var(--teal); margin-bottom:1rem; font-size:1rem;">Permanent Address</h3>
+          <div class="form-group">
+            <label for="permAddressLine">Address Line</label>
+            <input type="text" id="permAddressLine" placeholder="House No., Street, Area" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="permCity">City</label>
+              <input type="text" id="permCity" placeholder="City" />
+            </div>
+            <div class="form-group">
+              <label for="permState">State</label>
+              <input type="text" id="permState" placeholder="State" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="permCountry">Country</label>
+              <input type="text" id="permCountry" placeholder="Country" />
+            </div>
+            <div class="form-group">
+              <label for="permPincode">Pincode</label>
+              <input type="text" id="permPincode" placeholder="000000" />
+            </div>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn btn-outline" onclick="goToStep(2)">← Back</button>
+          <button class="btn btn-primary" onclick="goToStep(4)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 4: Education ─────────────────────────── -->
+      <div class="step-panel" id="step-4">
+        <div class="form-group">
+          <label for="qualification">Highest Qualification</label>
+          <select id="qualification">
+            <option value="">Select qualification</option>
+            <option value="High School">High School</option>
+            <option value="Diploma">Diploma</option>
+            <option value="Bachelor's">Bachelor's Degree</option>
+            <option value="Master's">Master's Degree</option>
+            <option value="PhD">PhD / Doctorate</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="institute">Institute / University</label>
+          <input type="text" id="institute" placeholder="Name of your college or university" />
+        </div>
+        <div class="form-group">
+          <label for="passingYear">Year of Passing</label>
+          <input type="number" id="passingYear" placeholder="e.g. 2024" min="1950" max="2030" />
+        </div>
+
+        <div class="step-nav">
+          <button class="btn btn-outline" onclick="goToStep(3)">← Back</button>
+          <button class="btn btn-primary" onclick="goToStep(5)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 5: Links & Socials ───────────────────── -->
+      <div class="step-panel" id="step-5">
+        <div class="form-group">
+          <label for="github">GitHub Profile URL</label>
+          <input type="url" id="github" placeholder="https://github.com/username" />
+        </div>
+        <div class="form-group">
+          <label for="linkedin">LinkedIn Profile URL</label>
+          <input type="url" id="linkedin" placeholder="https://linkedin.com/in/username" />
+        </div>
+        <div class="form-group">
+          <label for="portfolio">Portfolio / Website URL</label>
+          <input type="url" id="portfolio" placeholder="https://yoursite.com" />
+        </div>
+        <div class="form-group">
+          <label for="resume">Resume Link (Google Drive / PDF URL)</label>
+          <input type="url" id="resume" placeholder="https://drive.google.com/..." />
+        </div>
+
+        <div class="step-nav">
+          <button class="btn btn-outline" onclick="goToStep(4)">← Back</button>
+          <button class="btn btn-primary" onclick="goToStep(6)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 6: Projects ──────────────────────────── -->
+      <div class="step-panel" id="step-6">
+        <p style="margin-bottom:1.25rem; font-size:0.9rem;">Add your notable projects. You can add up to 5.</p>
+
+        <div id="projectsList"></div>
+
+        <button class="add-project-btn" id="addProjectBtn" onclick="addProject()">
+          + Add Project
+        </button>
+
+        <div class="step-nav">
+          <button class="btn btn-outline" onclick="goToStep(5)">← Back</button>
+          <button class="btn btn-primary" onclick="goToStep(7)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 7: Photo ─────────────────────────────── -->
+      <div class="step-panel" id="step-7">
+        <div class="avatar-upload">
+          <div id="avatarDisplay">
+            <div class="avatar-placeholder" onclick="document.getElementById('profileImageInput').click()">
+              📷
+            </div>
+          </div>
+          <p style="font-size:0.85rem; text-align:center;">
+            Click to upload your profile picture.<br/>
+            Square images work best. Max 2MB.
+          </p>
+          <input
+            type="file"
+            id="profileImageInput"
+            accept="image/*"
+            style="display:none;"
+            onchange="handleImageUpload(this)"
+          />
+          <button
+            class="btn btn-outline"
+            style="font-size:0.85rem; padding:0.5rem 1.25rem;"
+            onclick="document.getElementById('profileImageInput').click()"
+          >
+            Choose Photo
+          </button>
+          <span id="imageError" style="color:var(--coral); font-size:0.8rem; display:none;">
+            File too large. Please choose an image under 2MB.
+          </span>
+        </div>
+
+        <div class="step-nav">
+          <button class="btn btn-outline" onclick="goToStep(6)">← Back</button>
+          <button class="btn btn-primary" onclick="goToStep(8)">Review →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 8: Review ────────────────────────────── -->
+      <div class="step-panel" id="step-8">
+        <div id="reviewContent"></div>
+
+        <div class="step-nav">
+          <button class="btn btn-outline" onclick="goToStep(7)">← Back</button>
+          <button class="btn btn-primary" id="submitBtn" onclick="submitForm()">
+            Create Account ✓
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/register.js"></script>
+</body>
+</html>

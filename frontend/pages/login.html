@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — User Management System</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    .login-card {
+      max-width: 420px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* Spinning loader inside button */
+    .btn-spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-layout">
+  <!-- ── Left Panel ─────────────────────────────────────── -->
+  <div class="auth-left">
+    <div class="auth-brand">
+      <div class="auth-brand-icon">👤</div>
+      <span class="auth-brand-name">UserMS</span>
+    </div>
+
+    <h1>Welcome back.</h1>
+    <p>Sign in to access your dashboard, manage your profile, and track your progress.</p>
+
+    <ul class="auth-features">
+      <li>
+        <span class="icon" style="background:rgba(255,201,75,0.2)">🔑</span>
+        Secure login with JWT
+      </li>
+      <li>
+        <span class="icon" style="background:rgba(249,166,108,0.2)">📊</span>
+        Personal dashboard
+      </li>
+      <li>
+        <span class="icon" style="background:rgba(241,122,126,0.2)">✏️</span>
+        Edit your full profile anytime
+      </li>
+    </ul>
+  </div>
+
+  <!-- ── Right Panel ─────────────────────────────────────── -->
+  <div class="auth-right" style="justify-content:center; display:flex; align-items:center;">
+    <div class="login-card">
+
+      <div class="accent-bar"></div>
+
+      <h2 style="margin-bottom:0.25rem;">Sign In</h2>
+      <p style="margin-bottom:2rem;">
+        Don't have an account?
+        <a href="register.html">Create one here</a>
+      </p>
+
+      <!-- Alert -->
+      <div class="alert" id="loginAlert"></div>
+
+      <!-- Form -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          placeholder="jane@example.com"
+          autocomplete="email"
+        />
+        <span class="field-error" id="emailErr">Enter a valid email</span>
+      </div>
+
+      <div class="form-group">
+        <label for="password" style="display:flex; justify-content:space-between; align-items:center;">
+          Password
+          <a href="#" style="font-size:0.78rem; font-weight:400; text-transform:none; letter-spacing:0;">
+            Forgot password?
+          </a>
+        </label>
+        <input
+          type="password"
+          id="password"
+          placeholder="Enter your password"
+          autocomplete="current-password"
+        />
+        <span class="field-error" id="passwordErr">Password is required</span>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="loginBtn" onclick="handleLogin()">
+        Sign In
+      </button>
+
+      <div class="divider">or</div>
+
+      <a href="register.html" class="btn btn-outline btn-full">
+        Create New Account
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<script src="../js/login.js"></script>
+</body>
+</html>
